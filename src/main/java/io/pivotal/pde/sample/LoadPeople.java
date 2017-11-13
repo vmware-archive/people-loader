@@ -2,6 +2,7 @@ package io.pivotal.pde.sample;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -44,6 +45,8 @@ public class LoadPeople {
 	private static String COUNT_ARG = "--count=";
 	private static String SLEEP_ARG = "--sleep=";
 	private static String THREADS_ARG = "--threads=";
+	private static String USERNAME_ARG = "--username=";
+	private static String PASSWORD_ARG = "--password=";
 	private static Pattern LOCATOR_PATTERN= Pattern.compile("(\\S+)\\[(\\d{1,5})\\]");
 
 	private static String regionName = "Person";
@@ -54,6 +57,10 @@ public class LoadPeople {
 	private static int threads = 1;
 	private static Region personRegion;
 	private static boolean partitionByZip = false;
+	
+	// intentionally package scope
+	static String username = "";
+	static String password = "";
 
 
 	public static void main( String[] args )
@@ -87,6 +94,10 @@ public class LoadPeople {
     			threads = parseIntArg(val, "threads argument must be a number");
     		} else if (arg.equals(PARTITION_ARG)){
     			partitionByZip = true;
+    		} else if (arg.startsWith(USERNAME_ARG)){
+    			username = arg.substring(USERNAME_ARG.length());
+    		} else if (arg.startsWith(PASSWORD_ARG)){
+    			password = arg.substring(PASSWORD_ARG.length());
     		} else {
     			System.out.println("unrecognized argument: " + arg);
     			System.exit(1);
@@ -114,7 +125,9 @@ public class LoadPeople {
     	}
 
     	PdxSerializer serializer = new ReflectionBasedAutoSerializer("io.pivotal.pde.sample.*");
-    	ClientCache cache = new ClientCacheFactory().setPdxSerializer(serializer).addPoolLocator(locatorHost, locatorPort).create();
+    	Properties cacheProps = new Properties();
+    	cacheProps.setProperty("security-client-auth-init", "io.pivotal.pde.sample.StaticAuthInit");
+    	ClientCache cache = new ClientCacheFactory(cacheProps).setPdxSerializer(serializer).addPoolLocator(locatorHost, locatorPort).create();
 //    	ClientCache cache = new ClientCacheFactory().addPoolLocator(locatorHost, locatorPort).create();
 		personRegion = cache.createClientRegionFactory(ClientRegionShortcut.PROXY).create(regionName);
 
@@ -188,4 +201,5 @@ public class LoadPeople {
     		}
 		}
 	}
+	
 }
