@@ -10,8 +10,15 @@ if __name__ == '__main__':
       sys.exit('please set the JAVA_HOME environment variable')
       
    here = os.path.dirname(os.path.abspath(sys.argv[0]))
+
+   # with partition resolver on the class path
    path = os.path.join(here,'target','people-loader-1.0-SNAPSHOT.jar') + \
-      os.pathsep + os.path.join(here,'target','dependency','*')
+      os.pathsep + os.path.join(here,'target','dependency','*') + \
+      os.pathsep + os.path.join(here,'..','partition-by-zip','target','partition-by-zip-1.0-SNAPSHOT.jar')
+   
+   # without partition resolver on the class path
+   #path = os.path.join(here,'target','people-loader-1.0-SNAPSHOT.jar') + \
+   #   os.pathsep + os.path.join(here,'target','dependency','*') 
    
    cname = 'io.pivotal.pde.sample.LoadPeople'
    

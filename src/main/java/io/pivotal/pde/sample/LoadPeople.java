@@ -5,14 +5,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.geode.cache.Region;
-import org.apache.geode.cache.client.ClientCache;
-import org.apache.geode.cache.client.ClientCacheFactory;
-import org.apache.geode.cache.client.ClientRegionShortcut;
-import org.apache.geode.pdx.PdxSerializer;
-import org.apache.geode.pdx.ReflectionBasedAutoSerializer;
-
-import io.pivotal.pde.nopdx.PersonKey;
+import com.gemstone.gemfire.cache.Region;
+import com.gemstone.gemfire.cache.client.ClientCache;
+import com.gemstone.gemfire.cache.client.ClientCacheFactory;
+import com.gemstone.gemfire.cache.client.ClientRegionShortcut;
+import com.gemstone.gemfire.pdx.PdxSerializer;
+import com.gemstone.gemfire.pdx.ReflectionBasedAutoSerializer;
 
 public class LoadPeople {
 
@@ -35,11 +33,9 @@ public class LoadPeople {
 		System.out.println("       only --locator and --count are required");
 		System.out.println("       --sleep is in milliseconds");
 		System.out.println("       --threads may not exceed 64");
-		System.out.println("       --partition-by-zip (optional)");
 	}
 
 	private static String REGION_ARG="--region=";
-	private static String PARTITION_ARG="--partition-by-zip";
 	private static String LOCATOR_ARG="--locator=";
 	private static String COUNT_ARG = "--count=";
 	private static String SLEEP_ARG = "--sleep=";
@@ -52,8 +48,7 @@ public class LoadPeople {
 	private static int count = 0;
 	private static int sleep = 0;
 	private static int threads = 1;
-	private static Region personRegion;
-	private static boolean partitionByZip = false;
+	private static Region<String,Person> personRegion;
 
 
 	public static void main( String[] args )
@@ -85,8 +80,6 @@ public class LoadPeople {
     		} else if (arg.startsWith(THREADS_ARG)){
     			String val = arg.substring(THREADS_ARG.length());
     			threads = parseIntArg(val, "threads argument must be a number");
-    		} else if (arg.equals(PARTITION_ARG)){
-    			partitionByZip = true;
     		} else {
     			System.out.println("unrecognized argument: " + arg);
     			System.exit(1);
@@ -116,9 +109,9 @@ public class LoadPeople {
     	PdxSerializer serializer = new ReflectionBasedAutoSerializer("io.pivotal.pde.sample.*");
     	ClientCache cache = new ClientCacheFactory().setPdxSerializer(serializer).addPoolLocator(locatorHost, locatorPort).create();
 //    	ClientCache cache = new ClientCacheFactory().addPoolLocator(locatorHost, locatorPort).create();
-		personRegion = cache.createClientRegionFactory(ClientRegionShortcut.PROXY).create(regionName);
+		personRegion = cache.<String,Person>createClientRegionFactory(ClientRegionShortcut.PROXY).create(regionName);
 
-		Thread []workers = new Thread[threads];
+		Worker []workers = new Worker[threads];
 		for(int i=0;i<threads; ++i){
 			workers[i] = new Worker(i);
 			workers[i].start();
@@ -127,6 +120,7 @@ public class LoadPeople {
 		for(int i=0;i<threads; ++i){
 			try {
 				workers[i].join();
+				System.out.println(String.format("thread %2d put %6d entries", i, workers[i].getPutCount()));
 			} catch(InterruptedException x){
 				System.out.println("interrupted while waiting for worker thread to stop ");
 			}
@@ -146,7 +140,8 @@ public class LoadPeople {
 
 	private static class Worker extends Thread {
 		private int slice;
-
+		private int putCount = 0;
+		
 		public Worker(int s){
 			super();
 			this.setDaemon(false);
@@ -156,20 +151,15 @@ public class LoadPeople {
 		@Override
 		public void run(){
 			Person p = null;
-    		Map<Object, Person> batch = new HashMap<Object,Person>(batchSize);
+    		Map<String, Person> batch = new HashMap<String,Person>(batchSize);
     		for(int i=slice; i < count; i += threads){
     			p = Person.fakePerson();
-    			if (partitionByZip){
-    				p.setId(new PersonKey(i, p.getAddress().getZip()));
-    				batch.put(new PersonKey(i, p.getAddress().getZip()), p);
-    			}
-    			else {
-    				p.setId(Integer.valueOf(i));
-    				batch.put(i, p);
-    			}
+				p.setId(i);
+				batch.put(String.format("%s|%08d", p.getAddress().getZip(), Integer.valueOf(i)), p);
 
     			if (batch.size() == batchSize){
     				personRegion.putAll(batch);
+    				putCount += batch.size();
     				updateStatus(batch.size());
     				batch.clear();
     				if (sleep > 0){
@@ -183,9 +173,16 @@ public class LoadPeople {
     		}
     		if (batch.size() > 0){
 				personRegion.putAll(batch);
+				putCount += batch.size();
 				updateStatus(batch.size());
 				batch.clear();
     		}
 		}
+
+		public int getPutCount() {
+			return putCount;
+		}
+		
+		
 	}
 }

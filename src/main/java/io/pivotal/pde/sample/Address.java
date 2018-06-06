@@ -37,6 +37,7 @@ public class Address implements Serializable {
 	}
 
 	private static Faker faker = new Faker();
+	private static int n = 0;
 	
 	public synchronized static Address fakeAddress(){
 		Address result = new Address();
@@ -44,7 +45,7 @@ public class Address implements Serializable {
 		result.setStreet(fakeAddr.streetAddress());
 		result.setCity(fakeAddr.city());
 		result.setState(fakeAddr.stateAbbr());
-		result.setZip(fakeAddr.zipCode());
+		result.setZip(String.format("%05d", Integer.valueOf( (n++) % 10)));
 		
 		return result;
 	}
