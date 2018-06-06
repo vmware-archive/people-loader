@@ -43,39 +43,30 @@
 		</plugins>
 	</build>
 	<repositories>
+<!-- 		<repository> -->
+<!-- 			<id>gemfire-release-repo</id> -->
+<!-- 			<name>Pivotal GemFire Release Repository</name> -->
+<!-- 			<url>https://commercial-repo.pivotal.io/data3/gemfire-release-repo/gemfire</url> -->
+<!-- 		</repository> -->
 		<repository>
-			<id>gemfire-release-repo</id>
-			<name>Pivotal GemFire Release Repository</name>
-			<url>https://commercial-repo.pivotal.io/data3/gemfire-release-repo/gemfire</url>
+		<id>gemfire-repository</id>
+		<name>Gemfire Repository</name>
+		<url>http://dist.gemstone.com/maven/release</url>
 		</repository>
-		<!-- <repository> -->
-		<!-- <id>gemfire-repository</id> -->
-		<!-- <name>Gemfire Repository</name> -->
-		<!-- <url>http://dist.gemstone.com/maven/release</url> -->
-		<!-- </repository> -->
+		<!--  had to add this to pick up the jline dependency -->
+		<repository>
+			<id>spring-plugins</id>
+			<name>Spring Plugins Repository</name>
+			<url>http://repo.spring.io/plugins-release</url>
+		</repository>
 	</repositories>
 
 	<dependencies>
 		<dependency>
-			<groupId>io.pivotal.gemfire</groupId>
-			<artifactId>geode-core</artifactId>
-			<version>9.0.4</version>
+			<groupId>com.gemstone.gemfire</groupId>
+			<artifactId>gemfire</artifactId>
+			<version>8.0.0</version>
 		</dependency>
-		<dependency>
-			<groupId>io.pivotal.gemfire</groupId>
-			<artifactId>geode-wan</artifactId>
-			<version>9.0.4</version>
-		</dependency>
-		<dependency>
-			<groupId>io.pivotal.gemfire</groupId>
-			<artifactId>geode-cq</artifactId>
-			<version>9.0.4</version>
-		</dependency>
-<!-- 		<dependency> -->
-<!-- 			<groupId>com.gemstone.gemfire</groupId> -->
-<!-- 			<artifactId>gemfire</artifactId> -->
-<!-- 			<version>8.2.1</version> -->
-<!-- 		</dependency> -->
 		<dependency>
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
