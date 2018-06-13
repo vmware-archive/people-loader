@@ -3,6 +3,9 @@ package io.pivotal.pde.sample;
 import java.io.Serializable;
 import java.util.Random;
 
+import com.gemstone.gemfire.cache.client.ClientCacheFactory;
+import com.gemstone.gemfire.pdx.PdxInstance;
+import com.gemstone.gemfire.pdx.PdxInstanceFactory;
 import com.github.javafaker.Faker;
 import com.github.javafaker.Name;
 
@@ -74,6 +77,29 @@ public class Person implements Serializable {
 
 	private static Faker faker = new Faker();
 	private static Random rand = new Random();
+
+	public synchronized static PdxInstance fakePersonPdxInstance(int id, String zip){
+		PdxInstanceFactory factory = ClientCacheFactory.getAnyInstance().createPdxInstanceFactory(Person.class.getName());
+		
+		Name fakeName = faker.name();
+		
+		factory.writeString("lastName", fakeName.lastName());
+		factory.writeString("firstName", fakeName.firstName());
+		factory.writeString("phone", faker.phoneNumber().phoneNumber());
+		factory.writeObject("address", Address.fakeAddressPdxInstance(zip));
+		
+		if (rand.nextBoolean())
+			factory.writeString("gender", "F");
+		else
+			factory.writeString("gender", "M");
+		
+		factory.writeInt("age",rand.nextInt(100));
+		
+		factory.writeInt("id", id);
+		
+		return factory.create();
+	}
+
 	
 	public synchronized static Person fakePerson(){
 		Person result = new Person();

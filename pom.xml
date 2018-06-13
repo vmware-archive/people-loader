@@ -43,25 +43,38 @@
 		</plugins>
 	</build>
 	<repositories>
-<!-- 		<repository> -->
-<!-- 			<id>gemfire-release-repo</id> -->
-<!-- 			<name>Pivotal GemFire Release Repository</name> -->
-<!-- 			<url>https://commercial-repo.pivotal.io/data3/gemfire-release-repo/gemfire</url> -->
-<!-- 		</repository> -->
+		<!-- <repository> -->
+		<!-- <id>gemfire-release-repo</id> -->
+		<!-- <name>Pivotal GemFire Release Repository</name> -->
+		<!-- <url>https://commercial-repo.pivotal.io/data3/gemfire-release-repo/gemfire</url> -->
+		<!-- </repository> -->
 		<repository>
-		<id>gemfire-repository</id>
-		<name>Gemfire Repository</name>
-		<url>http://dist.gemstone.com/maven/release</url>
+			<id>gemfire-repository</id>
+			<name>Gemfire Repository</name>
+			<url>http://dist.gemstone.com/maven/release</url>
 		</repository>
-		<!--  had to add this to pick up the jline dependency -->
+		<!-- had to add this to pick up the jline dependency -->
 		<repository>
 			<id>spring-plugins</id>
 			<name>Spring Plugins Repository</name>
 			<url>http://repo.spring.io/plugins-release</url>
 		</repository>
+		<repository>
+			<id>spring-libs-release</id>
+			<name>Spring Releases</name>
+			<url>https://repo.spring.io/libs-release</url>
+			<snapshots>
+				<enabled>false</enabled>
+			</snapshots>
+		</repository>
 	</repositories>
 
 	<dependencies>
+		<dependency>
+			<groupId>org.springframework.data</groupId>
+			<artifactId>spring-data-gemfire</artifactId>
+			<version>1.7.0.RELEASE</version>
+		</dependency>
 		<dependency>
 			<groupId>com.gemstone.gemfire</groupId>
 			<artifactId>gemfire</artifactId>
@@ -71,6 +84,12 @@
 			<groupId>com.github.javafaker</groupId>
 			<artifactId>javafaker</artifactId>
 			<version>0.11</version>
+		</dependency>
+		<dependency>
+			<groupId>io.pivotal.pde</groupId>
+			<artifactId>partition-by-zip</artifactId>
+			<version>1.0-SNAPSHOT</version>
+			<scope>runtime</scope>
 		</dependency>
 	</dependencies>
 </project>

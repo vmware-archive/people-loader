@@ -2,6 +2,9 @@ package io.pivotal.pde.sample;
 
 import java.io.Serializable;
 
+import com.gemstone.gemfire.cache.client.ClientCacheFactory;
+import com.gemstone.gemfire.pdx.PdxInstance;
+import com.gemstone.gemfire.pdx.PdxInstanceFactory;
 import com.github.javafaker.Faker;
 
 public class Address implements Serializable {
@@ -48,6 +51,19 @@ public class Address implements Serializable {
 		result.setZip(String.format("%05d", Integer.valueOf( (n++) % 10)));
 		
 		return result;
+	}
+	
+	public synchronized static PdxInstance fakeAddressPdxInstance(String zip){
+		com.github.javafaker.Address fakeAddr = faker.address();
+
+		PdxInstanceFactory factory = ClientCacheFactory.getAnyInstance().createPdxInstanceFactory(Address.class.getName());
+		
+		factory.writeString("street", fakeAddr.streetAddress());
+		factory.writeString("city",fakeAddr.city() );
+		factory.writeString("state", fakeAddr.stateAbbr());
+		factory.writeString("zip", zip);
+		
+		return factory.create();
 	}
 	
 	@Override
