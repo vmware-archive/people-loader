@@ -71,38 +71,38 @@ public class LoadPeople {
 		public void run(){
 			PdxInstance p = null;
 			String zip = null;
-    		Map<String, PdxInstance> batch = new HashMap<String,PdxInstance>(batchSize);
+//    		Map<String, PdxInstance> batch = new HashMap<String,PdxInstance>(batchSize);
     		for(int i=slice; i < count; i += threads){
     			
     			zip = String.format("%05d", i % 10);
     			// passing in the address rather than extracting it because extracting 
     			// it requires a pdx serializer which I don't think is present with streams
     			p = Person.fakePersonPdxInstance(i, zip);
-//    			personRegion.put(String.format("%s|%08d", zip, Integer.valueOf(i)), p);
-//    			putCount += 1;
-//    			updateStatus(1);
-				batch.put(String.format("%s|%08d", zip, Integer.valueOf(i)), p);
+    			personRegion.put(String.format("%s|%08d", zip, Integer.valueOf(i)), p);
+    			putCount += 1;
+    			updateStatus(1);
+//				batch.put(String.format("%s|%08d", zip, Integer.valueOf(i)), p);
 
-    			if (batch.size() == batchSize){
-    				personRegion.putAll(batch);
-    				putCount += batch.size();
-    				updateStatus(batch.size());
-    				batch.clear();
-    				if (sleep > 0){
-    					try {
-    						Thread.sleep(sleep);
-    					} catch(InterruptedException x){
-    						// ok
-    					}
-    				}
-    			}
+//    			if (batch.size() == batchSize){
+//    				personRegion.putAll(batch);
+//    				putCount += batch.size();
+//    				updateStatus(batch.size());
+//    				batch.clear();
+//    				if (sleep > 0){
+//    					try {
+//    						Thread.sleep(sleep);
+//    					} catch(InterruptedException x){
+//    						// ok
+//    					}
+//    				}
+//    			}
     		}
-    		if (batch.size() > 0){
-				personRegion.putAll(batch);
-				putCount += batch.size();
-				updateStatus(batch.size());
-				batch.clear();
-    		}
+//    		if (batch.size() > 0){
+//				personRegion.putAll(batch);
+//				putCount += batch.size();
+//				updateStatus(batch.size());
+//				batch.clear();
+//    		}
 		}
 
 		public int getPutCount() {

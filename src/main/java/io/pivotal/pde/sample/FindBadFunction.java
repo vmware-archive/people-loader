@@ -7,33 +7,29 @@ import com.gemstone.gemfire.cache.execute.RegionFunctionContext;
 import com.gemstone.gemfire.cache.partition.PartitionRegionHelper;
 import com.gemstone.gemfire.pdx.PdxInstance;
 
-public class ClearByZipFunction implements Function {
+public class FindBadFunction implements Function {
 
 
 	@Override
 	public void execute(FunctionContext ctx) {
 		RegionFunctionContext rctx = (RegionFunctionContext) ctx;
 		
-		String []args = (String [])ctx.getArguments();
-		String zip = args[0];
 		
 		int result = 0;
 		Region<String, PdxInstance> region = PartitionRegionHelper.getLocalDataForContext(rctx);
 		for(String key: region.keySet()){
-			PdxInstance address = (PdxInstance) region.get(key).getField("address");
-			String z = (String) address.getField("zip");
-			if (z.equals(zip)) {
-				result +=1;
-				region.remove(key);
+			PdxInstance person = (PdxInstance) region.get(key);
+			if (person == null){
+				ctx.getResultSender().sendResult("missing key: " + key);
 			}
 		}
 		
-		rctx.getResultSender().lastResult(Integer.valueOf(result));
+		rctx.getResultSender().lastResult("done");
 	}
 
 	@Override
 	public String getId() {
-		return "ClearByZip";
+		return "FindBad";
 	}
 
 	@Override

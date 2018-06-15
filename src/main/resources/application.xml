@@ -16,8 +16,8 @@
 	<gfe:client-region id="region" name="person2" cache-ref="clientCache" data-policy="EMPTY"/>
 	
 	<bean id="config" class="io.pivotal.pde.sample.AppConfig">
-		<property name="count" value="100000"/>
+		<property name="count" value="10000"/>
 		<property name="sleep" value="0"/>
-		<property name="threads" value="10"/>
+		<property name="threads" value="4"/>
 	</bean>
 </beans>
