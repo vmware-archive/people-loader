@@ -17,7 +17,7 @@ import io.pivotal.pde.nopdx.PersonKey;
 
 public class LoadPeople {
 
-	private static int batchSize = 100;
+	private static int batchSize = 10000;
 
 	private static int parseIntArg(String in, String message){
     	int result = 0;
