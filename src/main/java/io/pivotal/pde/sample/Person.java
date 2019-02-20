@@ -1,10 +1,10 @@
 package io.pivotal.pde.sample;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Random;
 
 import com.github.javafaker.Faker;
-import com.github.javafaker.Name;
 
 public class Person implements Serializable {
 
@@ -17,6 +17,7 @@ public class Person implements Serializable {
 	private Object id;
 	private int age;
 	
+	private ArrayList<Address> pastAddresses = new ArrayList<>(4);
 	
 	public int getAge() {
 		return age;
@@ -64,7 +65,14 @@ public class Person implements Serializable {
 		this.gender = gender;
 	}
 
-
+	public ArrayList<Address> getPastAddresses() {
+		return pastAddresses;
+	}
+	
+	public void addPastAddress(Address addr){
+		this.pastAddresses.add(addr);
+	}
+	
 	@Override
 	public String toString() {
 		return "Person [lastName=" + lastName + ", firstName=" + firstName + ", phone=" + phone + ", address=" + address
@@ -77,9 +85,8 @@ public class Person implements Serializable {
 	
 	public synchronized static Person fakePerson(){
 		Person result = new Person();
-		Name fakeName = faker.name();
-		result.setLastName(fakeName.lastName());
-		result.setFirstName(fakeName.firstName());
+		result.setLastName(faker.name().lastName());
+		result.setFirstName(faker.name().firstName());
 		result.setPhone(faker.phoneNumber().phoneNumber());
 		result.setAddress(Address.fakeAddress());
 		
@@ -89,6 +96,11 @@ public class Person implements Serializable {
 			result.setGender("M");
 		
 		result.setAge(rand.nextInt(100));
+		
+		int addrCount = rand.nextInt(5);
+		for(int i=0;i < addrCount; i++){
+			result.addPastAddress(Address.fakeAddress());
+		}
 		
 		return result;
 	}
