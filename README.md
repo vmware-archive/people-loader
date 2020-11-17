@@ -1,4 +1,4 @@
-# Overview #
+<h1> VMware has ended active development of this project, this repository will no longer be updated.</h1><br># Overview #
 people-loader is a simple little program which generates fake people
 entries with plausible names and addresses, and loads them into a
 gemfire cluster.  It is useful for demos and smoke tests.
